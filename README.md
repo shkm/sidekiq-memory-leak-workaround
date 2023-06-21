@@ -16,3 +16,8 @@ docker run --rm -p 6379:6379 redis # if you need it
 bundle && bundle exec sidekiq --config sidekiq.yml
 ./simulate
 ```
+
+## How does it work?
+We define a Sidekiq server middleware in `memory_limit_middleware.rb` which checks the process' memory usage before executing each job; if it finds that it's above a given threshold, the process is killed (gracefully).
+
+See `sidekiq_initializer.rb` for the entrypoint.
