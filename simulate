@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative 'jobs'
+
+INTERVAL = 5 # seconds
+
+Signal.trap('INT') { exit }
+
+puts "Sending jobs at #{INTERVAL} second intervals..."
+loop do
+  LeakyJob.perform_async
+  sleep INTERVAL
+end
