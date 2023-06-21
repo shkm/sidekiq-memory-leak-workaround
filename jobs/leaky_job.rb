@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "sidekiq"
+require "sidekiq/api"
 
 class LeakyJob
   include Sidekiq::Job
@@ -8,7 +9,8 @@ class LeakyJob
 
   def perform
     logger.info "Memory usage is #{memory_usage}MB"
-    if memory_usage > THRESHOLD
+
+    if memory_usage > THRESHOLD && process_is_sidekiq?
       logger.warn "Memory usage is above threshold; killing process."
 
       # "TERM" gives jobs a bit of time to finish before pushing them back to redis.
@@ -26,6 +28,10 @@ class LeakyJob
     sleep 10
 
     logger.info "Finished"
+  end
+
+  def process_is_sidekiq?
+    Sidekiq::ProcessSet.new.detect { |process| process["pid"] == Process.pid }
   end
 
   # Simulates a memory leak; globals are not garbage collected.
