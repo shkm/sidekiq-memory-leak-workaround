@@ -9,9 +9,10 @@ class MemoryLimitMiddleware
 
 
   def call(job_instance, job_payload, queue)
-    logger.info "Memory usage is #{memory_usage}MB"
+    mem = memory_usage
+    logger.info "Memory usage is #{mem}MB"
 
-    if memory_usage > limit
+    if mem > limit
       logger.warn "Memory usage is above limit; killing process."
 
       # "TERM" gives jobs a bit of time to finish before pushing them back to redis.
